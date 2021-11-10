@@ -16,7 +16,6 @@ ACS_18 <- select(ACS_18_raw, OCCP, AGEP, PWGTP)
 ACS_19 <- select(ACS_19_raw, OCCP, AGEP, PWGTP)
 
 ## Add variable YEAR that tells what year observation comes from 
-## and sample weight as proportion total of year
 ACS_15 <- mutate(ACS_15, YEAR = rep(2015, length(PWGTP)))
 ACS_16 <- mutate(ACS_16, YEAR = rep(2016, length(PWGTP)))
 ACS_17 <- mutate(ACS_17, YEAR = rep(2017, length(PWGTP)))
@@ -36,7 +35,7 @@ comb_ACS <- bind_rows(ACS_15, ACS_16, ACS_17, ACS_18, ACS_19)
 ## Convert OCCP back to character
 comb_ACS$OCCP <- as.character(comb_ACS$OCCP)
 
-## Create a data frame that give the weighted average age for each occupation in each year
+## Create a data frame that gives the weighted average age for each occupation in each year
 mean_age_occp <- comb_ACS %>% 
   group_by(OCCP, YEAR) %>% 
   mutate(weight = PWGTP / sum(PWGTP)) %>% 
