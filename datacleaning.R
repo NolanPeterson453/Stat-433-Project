@@ -42,4 +42,32 @@ mean_age_occp <- comb_ACS %>%
   summarise(mean_age = sum(AGEP * weight, na.rm = TRUE)) 
 
 
-## Need to load in OES data and clean ##
+## Load in OES data and get the Wisconsin data only ##
+OES_16_raw <- read_excel('state_M2016_dl.xlsx',1)%>%
+  filter(STATE=="Wisconsin")%>%
+  mutate(YEAR=2016)%>%
+  select(-ST)
+OES_17_raw <- read_excel('state_M2017_dl.xlsx',1)%>%
+  filter(STATE=="Wisconsin")%>%
+  mutate(YEAR=2017)%>%
+  select(-ST)
+OES_18_raw <- read_excel('state_M2018_dl.xlsx',1)%>%
+  filter(STATE=="Wisconsin")%>%
+  mutate(YEAR=2018)%>%
+  select(-ST)
+OES_19_raw <- read_excel('state_M2019_dl.xlsx',1)%>%
+  rename(STATE=area_title,OCC_GROUP=o_group,LOC_Q=loc_quotient)
+names(OES_19_raw)<-toupper(names(OES_19_raw))
+OES_19_raw <-OES_19_raw%>%
+  filter(STATE=="Wisconsin")%>%
+  mutate(YEAR=2019)%>%
+  select(-AREA_TYPE,-NAICS,-NAICS_TITLE,-I_GROUP,-OWN_CODE,-PCT_TOTAL)
+OES_20_raw <- read_excel('state_M2020_dl.xlsx',1)%>%
+  rename(STATE=AREA_TITLE,OCC_GROUP=O_GROUP,LOC_Q=LOC_QUOTIENT)%>%
+  filter(STATE=="Wisconsin")%>%
+  mutate(YEAR=2020)%>%
+  select(-AREA_TYPE,-NAICS,-NAICS_TITLE,-I_GROUP,-OWN_CODE,-PCT_TOTAL,-PRIM_STATE)
+
+
+## Stack all 5 years into one dataframe
+total <- rbind(OES_16_raw,OES_17_raw,OES_18_raw,OES_19_raw,OES_20_raw)
