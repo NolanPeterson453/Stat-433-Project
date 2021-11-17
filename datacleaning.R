@@ -9,11 +9,11 @@ ACS_18_raw <- read_csv(file = 'https://raw.githubusercontent.com/NolanPeterson45
 ACS_19_raw <- read_csv(file = 'https://raw.githubusercontent.com/NolanPeterson453/Stat-433-Project/main/ACS_WI_2019.csv')
 
 ## Select the variables OCCP (occupation), AGEP (age), PWGTP (sample weight)
-ACS_15 <- select(ACS_15_raw, OCCP, AGEP, PWGTP)
-ACS_16 <- select(ACS_16_raw, OCCP, AGEP, PWGTP)
-ACS_17 <- select(ACS_17_raw, OCCP, AGEP, PWGTP)
-ACS_18 <- select(ACS_18_raw, OCCP, AGEP, PWGTP)
-ACS_19 <- select(ACS_19_raw, OCCP, AGEP, PWGTP)
+ACS_15 <- select(ACS_15_raw, OCCP, AGEP, PWGTP, ESR)
+ACS_16 <- select(ACS_16_raw, OCCP, AGEP, PWGTP, ESR)
+ACS_17 <- select(ACS_17_raw, OCCP, AGEP, PWGTP, ESR)
+ACS_18 <- select(ACS_18_raw, OCCP, AGEP, PWGTP, ESR)
+ACS_19 <- select(ACS_19_raw, OCCP, AGEP, PWGTP, ESR)
 
 ## Add variable YEAR that tells what year observation comes from 
 ACS_15 <- mutate(ACS_15, YEAR = rep(2015, length(PWGTP)))
@@ -35,11 +35,19 @@ comb_ACS <- bind_rows(ACS_15, ACS_16, ACS_17, ACS_18, ACS_19)
 ## Convert OCCP back to character
 comb_ACS$OCCP <- as.character(comb_ACS$OCCP)
 
-## Create a data frame that gives the weighted average age for each occupation in each year
+## Create a data frame that gives the weighted average age for each occupation in each year 
+## and unemployment rate for each occupation by year 
 mean_age_occp <- comb_ACS %>% 
   group_by(OCCP, YEAR) %>% 
   mutate(weight = PWGTP / sum(PWGTP)) %>% 
-  summarise(mean_age = sum(AGEP * weight, na.rm = TRUE)) 
+  summarise(mean_age = sum(AGEP * weight, na.rm = TRUE),
+            unemployed_rate = (sum(PWGTP[which(ESR == 3)], na.rm = TRUE) / sum(PWGTP, na.rm = TRUE)) * 100 ) 
+
+## Average Unemployment rates by year for all sectors 
+mean_age_occp %>% 
+  group_by(OCCP) %>% 
+  summarise(overall_unemp_rate = mean(unemployed_rate)) %>% 
+  View()
 
 
 ## Load in OES data and get the Wisconsin data only ##
