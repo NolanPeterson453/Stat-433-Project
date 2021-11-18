@@ -35,13 +35,18 @@ comb_ACS <- bind_rows(ACS_15, ACS_16, ACS_17, ACS_18, ACS_19)
 ## Convert OCCP back to character
 comb_ACS$OCCP <- as.character(comb_ACS$OCCP)
 
+#############################USE THIS#############################
 ## Create a data frame that gives the weighted average age for each occupation in each year 
 ## and unemployment rate for each occupation by year 
 mean_age_occp <- comb_ACS %>% 
   group_by(OCCP, YEAR) %>% 
   mutate(weight = PWGTP / sum(PWGTP)) %>% 
   summarise(mean_age = sum(AGEP * weight, na.rm = TRUE),
-            unemployed_rate = (sum(PWGTP[which(ESR == 3)], na.rm = TRUE) / sum(PWGTP, na.rm = TRUE)) * 100 ) 
+            unemployed_rate = (sum(PWGTP[which(ESR == 3)], na.rm = TRUE) / sum(PWGTP, na.rm = TRUE)) * 100 ) %>% 
+  filter(YEAR == 2016 & YEAR == 2019)
+
+## Filter out so you just have 
+#########################################################################
 
 ## Average Unemployment rates by year for all sectors 
 mean_age_occp %>% 
@@ -79,3 +84,8 @@ OES_20_raw <- read_excel('state_M2020_dl.xlsx',1)%>%
 
 ## Stack all 5 years into one dataframe
 total <- rbind(OES_16_raw,OES_17_raw,OES_18_raw,OES_19_raw,OES_20_raw)
+
+# filter out so just 2016, 2018 and 2019
+# need 2018 to create variable for wage growth <- 2018 wage / 2019 wage 
+# covert to ACS codes
+# Join OCCP and OCC code 
