@@ -99,7 +99,7 @@ comb_ACS_OES_KEY <- comb_ACS_OES_KEY %>%
          !is.na(OCC_TITLE))
 
 ## Assign NA to missing values in the data
-## Assign data types to numeric variables 
+## Assign data types to numeric and factor variables 
 ## Remove NA's from data
 comb_ACS_OES_KEY[comb_ACS_OES_KEY == "*" | comb_ACS_OES_KEY == "**"] <- NA
 comb_ACS_OES_KEY[,7:12] <- as.data.frame(sapply(comb_ACS_OES_KEY[,7:12], as.numeric))
