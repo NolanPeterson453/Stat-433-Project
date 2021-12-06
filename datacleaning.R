@@ -170,6 +170,13 @@ cleaned_data %>%
   labs(title = "Occupational Age Averages in 2016 vs Shortages in 2019",
       y = "Occupational Average Ages")
 
+cleaned_data %>% 
+  ggplot(aes(x = mean_age.x, fill = shortage)) +
+  geom_density(alpha=0.4) +
+  labs(title = "Occupational Age Averages Distributions in 2016 by Shortages in 2019",
+       x = "Occupational Average Ages")
+
+
 ## No real significant relationship between the severity and average age in 2016
 cleaned_data %>% 
   filter(shortage_ind == 1) %>% 
