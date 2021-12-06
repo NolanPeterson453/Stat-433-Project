@@ -13,6 +13,7 @@
 ## Library Statements 
 library(tidyverse)
 library(readxl)
+library(BBmisc)
 
 ## Read in the ACS data for 2016 and 2019 
 ACS_16_raw <- read_csv(file = 'https://raw.githubusercontent.com/NolanPeterson453/Stat-433-Project/main/ACS_WI_2016.csv')
@@ -129,10 +130,48 @@ cleaned_data_2019 <- cleaned_data %>%
 
 ## Join these two data set to get Year specific columns (x = 2016, y = 2019)
 ## could possibly be done with 'pivot_wider' but I had no luck
-cleaned_data <- inner_join(cleaned_data_2016, cleaned_data_2019, by = "OCCP") 
+## Filter out where no jobs in 2016
+cleaned_data <- inner_join(cleaned_data_2016, cleaned_data_2019, by = "OCCP") %>% 
+  filter(jobs_per_1000.x != 0)
 
+  
+## Create comparison variables 
+cleaned_data <- cleaned_data %>% 
+  mutate(emp_growth = (jobs_per_1000.y / jobs_per_1000.x) * (1/(3 - 1)), 
+         wage_growth = (mean_annual.y / mean_annual.x) * (1/(3 - 1))) 
 
+## Create indicator for shortage (0 = no shortage, 1 shortage)
+cleaned_data <- cleaned_data %>% 
+  mutate(shortage_ind = ifelse(test = (  (wage_growth > mean(wage_growth)) &
+                                     (unemployed_rate.y <  mean(unemployed_rate.y))),
+                           yes = 1,
+                           no = 0),
+         shortage = ifelse(test = (shortage_ind == 1), 
+                           yes = "Shortage",
+                           no = "No Shortage"),
+         severity = ifelse(test = (shortage_ind == 1),
+                           yes = normalize((mean(unemployed_rate.y) - unemployed_rate.y) +
+                                (wage_growth - mean(wage_growth))),
+                           no = 0))
 
+## Model of shortage predicted by age 
+model <- glm(shortage_ind ~ mean_age.x, family = binomial, data = cleaned_data)
+summary(model)
+
+## Visualize the relationship
+cleaned_data %>% 
+  ggplot(aes(y = mean_age.x, color = shortage)) +
+  geom_boxplot() +
+  facet_wrap(~ shortage) + 
+  labs(title = "Occupational Age Averages in 2016 vs Shortages in 2019",
+      y = "Occupational Average Ages")
+
+## No real significant relationship between the severity and average age in 2016
+cleaned_data %>% 
+  filter(shortage_ind == 1) %>% 
+  ggplot(aes(x = mean_age.x, y = severity)) +
+  geom_point()
+summary(lm(severity ~ mean_age.x, data = cleaned_data[cleaned_data$shortage_ind == 1,]))
 
 ################################################################################################
 
