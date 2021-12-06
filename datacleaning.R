@@ -138,11 +138,15 @@ cleaned_data <- inner_join(cleaned_data_2016, cleaned_data_2019, by = "OCCP") %>
 ## Create comparison variables 
 cleaned_data <- cleaned_data %>% 
   mutate(emp_growth = (jobs_per_1000.y / jobs_per_1000.x) * (1/(3 - 1)), 
-         wage_growth = (mean_annual.y / mean_annual.x) * (1/(3 - 1))) 
+         wage_growth = (mean_annual.y / mean_annual.x) * (1/(3 - 1)))
+
+## Row 79 is a huge outlier in employment growth 
+cleaned_data <- cleaned_data[-79,]
 
 ## Create indicator for shortage (0 = no shortage, 1 shortage)
 cleaned_data <- cleaned_data %>% 
-  mutate(shortage_ind = ifelse(test = (  (wage_growth > mean(wage_growth)) &
+  mutate(shortage_ind = ifelse(test = (  (emp_growth > mean(emp_growth)) &
+                                      (wage_growth > mean(wage_growth)) &
                                      (unemployed_rate.y <  mean(unemployed_rate.y))),
                            yes = 1,
                            no = 0),
@@ -172,6 +176,23 @@ cleaned_data %>%
   ggplot(aes(x = mean_age.x, y = severity)) +
   geom_point()
 summary(lm(severity ~ mean_age.x, data = cleaned_data[cleaned_data$shortage_ind == 1,]))
+
+## plots looking at each metric individually 
+cleaned_data %>% 
+  ggplot(aes(x = mean_age.x, y = unemployed_rate.y)) +
+  geom_point() +
+  geom_hline(yintercept = mean(cleaned_data$unemployed_rate.y))
+
+cleaned_data %>% 
+  ggplot(aes(x = mean_age.x, y = emp_growth)) +
+  geom_point() +
+  geom_hline(yintercept = mean(cleaned_data$emp_growth))
+
+cleaned_data %>% 
+  ggplot(aes(x = mean_age.x, y = wage_growth)) +
+  geom_point() +
+  geom_hline(yintercept = mean(cleaned_data$wage_growth))
+
 
 ################################################################################################
 
