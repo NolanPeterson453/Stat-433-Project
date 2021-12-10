@@ -243,60 +243,118 @@ year.2016<-cleaned_data[,-c(11:19)]%>%
          jobs_per_1000 = jobs_per_1000.x, mean_hourly = mean_hourly.x, mean_annual = mean_annual.x, mean_prse = mean_prse.x)
 year.2019<-cleaned_data[,c(2,11:24)]%>%
   rename(YEAR = YEAR.y,mean_age = mean_age.y,unemployed_rate= unemployed_rate.y,total_employ = total_employ.y,employ_prse = employ_prse.y,
-         jobs_per_1000 = jobs_per_1000.y, mean_hourly = mean_hourly.y, mean_annual = mean_annual.y, mean_prse = mean_prse.y)
-test<-rbind(year.2016,year.2019)
-```
+         jobs_per_1000 = jobs_per_1000.y, mean_hourly = mean_hourly.y, mean_annual = mean_annual.y, mean_prse = mean_prse.y)%>%
+  select(YEAR,everything())
+shiny.df<-rbind(year.2016,year.2019)
 
+```
 
 ```{r}
 # cleaned_data
 # Define UI for app that draws a histogram ----
 ui <- fluidPage(
     titlePanel("Shiny App"), #Title
-    sidebarLayout( #(layout)
+    sidebarLayout( # layout
     sidebarPanel(h1("Sidebar"),
     
     ## Radio selection
-    radioButtons("radio", label = h3("Year"),
-    choices = list("Year 2016" = 1, "Year 2019" = 2),
-    selected = 1),
-    hr(),
-    fluidRow(column(3, verbatimTextOutput("value"))),
-                 
+    # radioButtons("year", label = h4("Year"),
+    #             choices = c("2016", "2019"),
+    #             selected = "2016"),
+    # fluidRow(column(3, verbatimTextOutput("value"))),
+    # hr(),
+                
     ## Text input           
-    textInput("text", label = h3("Occuputation"), value = "Enter code..."),
+    textInput("text", label = h4("Occuputation"), value = "Enter code..."),
+    fluidRow(column(3, verbatimTextOutput("value"))),
     hr(),
-    fluidRow(column(3, verbatimTextOutput("value")))
+    submitButton("Search"),
+   
+    #helpText("https://www2.census.gov/programs-surveys/acs/tech_docs/pums/data_dict/PUMS_Data_Dictionary_2015-2019.pdf")
     
     ), #Side (panel)
     
     
     mainPanel( 
             dataTableOutput(outputId="dataTable"),
-            plotOutput("distPlot")
+            plotOutput("barPlot"),
+            plotOutput("distributionPlot"),
+            textOutput("shortage"),
+            tags$head(tags$style("#shortage{color: red;
+                                 font-size: 40px;
+                                 font-style: italic;
+                                 }"))
     ) 
-  
   )
 )
 
 server <- function(input, output) {
-  output$dataTable <- renderDataTable({
-    cleaned_data%>%
-      filter(input$YEAR.x)
+  filter.table <- reactive({
+      # filter(shiny.df , YEAR == input$year, OCCP == input$submit)
+      shiny.df%>%
+      select(-c(11:15))%>%
+      filter(OCCP == input$text)
+     
+  })
+  
+  filter.plot<- reactive({
+      plot<-shiny.df%>%
+      filter(OCCP==input$text)%>%
+      mutate(mean_annual = mean_annual/10000,total_employ=total_employ/100)%>%
+      rename(Mean.age=mean_age,`Unemployed.rate(%)`=unemployed_rate,`Mean.annual(10K)`=mean_annual,`Total.employ(100)`=total_employ,Employ.prse=employ_prse,`Jobs(K)`=jobs_per_1000,Mean.hourly=mean_hourly
+         ,Mean.prse=mean_prse)%>%
+    select(-c(11:15))%>% gather(key = Stat, value = Value, Mean.age:Mean.prse)
+ggplot(plot,aes(Stat,Value,fill=YEAR))+ 
+  geom_col(position = "dodge")+
+  xlab("Statistics")+
+  theme(axis.text.x = element_text(angle = 45, hjust=1))
+     
+  })
+  
+  ## Not Sure
+  distribution.plot<- reactive({
+      filter.val<-shiny.df%>%
+          filter(OCCP==input$text)%>%
+          filter(YEAR==2016)
+      ggplot(data = shiny.df, aes(x=mean_age)) +
+      stat_function(fun = dnorm, args = list(mean = mean(shiny.df$mean_age), sd = sd(shiny.df$mean_age)),color="Blue") +
+      scale_y_continuous(breaks = NULL)+ geom_hline(yintercept = 0)+ylab("Density")+xlab("Mean Age")+
+      geom_vline(xintercept=filter.val$mean_age,color="red")
+  })
+  
+  text <- reactive({
+      filter.text<-as.character(shiny.df%>%
+                  filter(OCCP==input$text)%>%
+                  filter(YEAR==2016)%>%
+                  select(shortage))
   })
   
   
+  output$dataTable <-
+    renderDataTable(filter.table())
   
+  output$barPlot <-
+    renderPlot(filter.plot())
+  
+  output$distributionPlot <-
+    renderPlot(distribution.plot())
+  
+  output$shortage <- 
+    renderText({
+      paste("Labors are", text())
+    })
   
 }
-
 shinyApp(ui = ui, server = server)
 ```
+
+
+
+
+
 
 ## Results
 
 
 ## Conclusion
-
-
 
