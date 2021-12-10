@@ -141,7 +141,7 @@ cleaned_data <- cleaned_data %>%
          wage_growth = (mean_annual.y / mean_annual.x) * (1/(3 - 1)))
 
 ## Row 79 is a huge outlier in employment growth 
-cleaned_data <- cleaned_data[-79,]
+cleaned_data <- cleaned_data[-79,] 
 
 ## Create indicator for shortage (0 = no shortage, 1 shortage)
 cleaned_data <- cleaned_data %>% 
@@ -152,51 +152,74 @@ cleaned_data <- cleaned_data %>%
                            no = 0),
          shortage = ifelse(test = (shortage_ind == 1), 
                            yes = "Shortage",
-                           no = "No Shortage"),
-         severity = ifelse(test = (shortage_ind == 1),
-                           yes = normalize((mean(unemployed_rate.y) - unemployed_rate.y) +
-                                (wage_growth - mean(wage_growth))),
-                           no = 0))
+                           no = "No Shortage")) %>%
+  select(-c( YEAR.x, YEAR.y))
+
+## Rename variables for clarity 
+cleaned_data <- cleaned_data %>% 
+  rename(mean_age_2016 = mean_age.x,
+         mean_age_2019 = mean_age.y,
+         unemployed_rate_2016 = unemployed_rate.x,
+         unemployed_rate_2019 = unemployed_rate.y,
+         total_employ_2016 = total_employ.x,
+         total_employ_2019 = total_employ.y,
+         employ_prse_2016 = employ_prse.x,
+         employ_prse_2019 = employ_prse.y,
+         jobs_per_1000_2016 = jobs_per_1000.x,
+         jobs_per_1000_2019 = jobs_per_1000.y,
+         mean_hourly_2016 = mean_hourly.x,
+         mean_hourly_2019 = mean_hourly.y,
+         mean_annual_2016 = mean_annual.x,
+         mean_annual_2019 = mean_annual.y,
+         mean_prse_2016 = mean_prse.x,
+         mean_prse_2019 = mean_prse.y)
+
+## Tack back on names 
+cleaned_data <- left_join(cleaned_data, key[,4:5], by = "OCCP") %>% distinct() 
+
+write.csv(cleaned_data, file = "cleaned_data_433.csv", row.names = FALSE)
 
 ## Model of shortage predicted by age 
 model <- glm(shortage_ind ~ mean_age.x, family = binomial, data = cleaned_data)
+# Look for other 2016 variables that we can predict with for shortage in 2019 
 summary(model)
 
 ## Visualize the relationship
 cleaned_data %>% 
-  ggplot(aes(y = mean_age.x, color = shortage)) +
+  ggplot(aes(y = mean_age_2016, color = shortage)) +
   geom_boxplot() +
   facet_wrap(~ shortage) + 
   labs(title = "Occupational Age Averages in 2016 vs Shortages in 2019",
       y = "Occupational Average Ages")
 
 cleaned_data %>% 
-  ggplot(aes(x = mean_age.x, fill = shortage)) +
+  ggplot(aes(x = mean_age_2016, fill = shortage)) +
   geom_density(alpha=0.4) +
   labs(title = "Occupational Age Averages Distributions in 2016 by Shortages in 2019",
        x = "Occupational Average Ages")
-
+# do t-test on these two groups 
+#t.test( x = mean_age_2016_shortage, y =mean_age_2016_no_shortage )
 
 ## No real significant relationship between the severity and average age in 2016
-cleaned_data %>% 
-  filter(shortage_ind == 1) %>% 
-  ggplot(aes(x = mean_age.x, y = severity)) +
-  geom_point()
-summary(lm(severity ~ mean_age.x, data = cleaned_data[cleaned_data$shortage_ind == 1,]))
+# cleaned_data %>% 
+#   filter(shortage_ind == 1) %>% 
+#   ggplot(aes(x = mean_age.x, y = severity)) +
+#   geom_point()
+# summary(lm(severity ~ mean_age.x, data = cleaned_data[cleaned_data$shortage_ind == 1,]))
 
 ## plots looking at each metric individually 
 cleaned_data %>% 
-  ggplot(aes(x = mean_age.x, y = unemployed_rate.y)) +
+  ggplot(aes(x = mean_age_2016, y = unemployed_rate_2019)) +
   geom_point() +
-  geom_hline(yintercept = mean(cleaned_data$unemployed_rate.y))
+  geom_hline(yintercept = mean(cleaned_data$unemployed_rate_2019))
 
 cleaned_data %>% 
-  ggplot(aes(x = mean_age.x, y = emp_growth)) +
+  ggplot(aes(x = mean_age_2016, y = emp_growth)) +
   geom_point() +
   geom_hline(yintercept = mean(cleaned_data$emp_growth))
 
 cleaned_data %>% 
-  ggplot(aes(x = mean_age.x, y = wage_growth)) +
+  ggplot(aes(x = mean_age_2016, y = wage_growth)) +
   geom_point() +
   geom_hline(yintercept = mean(cleaned_data$wage_growth))
 
