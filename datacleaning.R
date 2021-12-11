@@ -180,7 +180,7 @@ cleaned_data <- left_join(cleaned_data, key[,4:5], by = "OCCP") %>% distinct()
 write.csv(cleaned_data, file = "cleaned_data_433.csv", row.names = FALSE)
 
 ## Model of shortage predicted by age 
-model <- glm(shortage_ind ~ mean_age.x, family = binomial, data = cleaned_data)
+model <- glm(shortage_ind ~ mean_age_2016, family = binomial, data = cleaned_data)
 # Look for other 2016 variables that we can predict with for shortage in 2019 
 summary(model)
 
