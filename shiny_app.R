@@ -22,11 +22,6 @@ ui <- fluidPage(
   mainPanel(
     dataTableOutput(outputId="dataTable"),
     plotOutput('densityPlot'),
-    # textOutput("shortage"),
-    tags$head(tags$style("#shortage{color: red;
-                                 font-size: 40px;
-                                 font-style: italic;
-                                 }"))
   )
 )
 
@@ -56,10 +51,10 @@ server <- function(input, output){
   
   
   output$dataTable <- renderDataTable({
-    
-    filter(shiny_df, 
-           job_title  == input$job) %>% 
-      select(mean_annual_2019,emp_growth, wage_growth, unemployed_rate_2019, shortage) %>% 
+
+    filter(shiny_df,
+           job_title  == input$job) %>%
+      dplyr::select(mean_annual_2019,emp_growth, wage_growth, unemployed_rate_2019, shortage) %>%
       transmute(Mean_Annual_Salary = round(mean_annual_2019, 2),
                 Employment_Growth_Rate = round(emp_growth * 100, 2),
                 Wage_Growth_Rate = round(wage_growth * 100, 2),
