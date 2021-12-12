@@ -33,4 +33,11 @@ t_crit <- qt(p = 0.05, df = n_1 + n_2 - 2, lower.tail=FALSE) #1.663884
 
 p_value <- pt(q = t_obs, df = n_1 + n_2 - 2, lower.tail=FALSE) #0.02738522
 
+# 95% Confidence intervals for the t test statistic 
+
+S_p <- sqrt(((n_1 - 1) * sd_1^2 + (n_2 - 1) * sd_2^2  ) / (n_1 + n_2 - 2)) #6.016206
+
+lower <- (x_bar_1 - x_bar_2) - t_obs * S_p * sqrt(1/n_1 + 1/n_2) #-0.6078939
+
+upper <- (x_bar_1 - x_bar_2) + t_obs * S_p * sqrt(1/n_1 + 1/n_2) #6.711236
 
