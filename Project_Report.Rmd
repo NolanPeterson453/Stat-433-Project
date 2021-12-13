@@ -13,9 +13,11 @@ knitr::opts_chunk$set(echo = TRUE, tidy=TRUE, tidy.opts=list(width.cutoff=60), c
 
 ## Introduction
 
-The aim of this project is to analyze the relationship between age in occupational sectors and labor shortages within occupational sectors in Wisconsin. Furthermore we wish to test how well labor shortages can be predicted using ages within said occupational sectors. The motivation behind exploring this relationship is that there is a commonly held idea that jobs which are held mostly by older workers are more prone to shortages. For instance, the average age of farm workers in Wisconsin is 53, which is considerably greater than the average age of all workers in Wisconsin. Additionally there is a shortage of farm workers in Wisconsin. It would not be illogical to assume that there is a connection between these two facts. In this report we will explore this question. We will examine ages within occupations in 2016 and examine shortages within those same occupations in 2019. This relationship is visualized in figure 1. 
+The aim of this project is to analyze the relationship between age in occupational sectors and labor shortages within occupational sectors in Wisconsin. Furthermore we wish to test how well labor shortages can be predicted using ages within said occupational sectors. The motivation behind exploring this relationship is that there is a commonly held idea that jobs which are held mostly by older workers are more prone to shortages. For instance, the average age of farm workers in Wisconsin is 53, which is considerably greater than the average age of all workers in Wisconsin. Additionally there is a shortage of farm workers in Wisconsin. It would not be illogical to assume that there is a connection between these two facts. However, every assumption must be supported by data and careful statistical analysis. In this report we will explore this assumption. We will examine ages within occupations in 2016 and examine shortages within those same occupations in 2019. This hypothesiszed relationship is visualized in figure 1. 
 
 ![Theorized relationship between Age and Shortage](research question.png)
+
+After analysis we found that the data does not necessarily support this assumption.
 
 ### Thesis Statments
 
@@ -35,7 +37,7 @@ This grouped data frame was joined to the OEWS data for Wisconsin for 2016 and 2
 
 ### Defining a Labor Shortage
 
-A primary challenge of this project was identifying labor shortages in the 2019 data. A labor shortage has no exact definition in economics. However there is basis for defining a shortage within a given occupational sector with the following criteria (Barnow, 2016) and (Veneri, 1999). 
+A primary challenge of this project was identifying labor shortages in the 2019 data. A labor shortage has no exact definition in economics. However there is basis for defining a shortage within a given occupational sector with the following criteria (Barnow, 2016 page 1) and (Veneri, 1999 page 17). 
 
 An occupational shortage is defined by three criteria:
 
@@ -92,7 +94,7 @@ The value is compared to critical values of a standard normal distribution. For 
 
 ### Firth's Logistic Regression
 
-Firth's Logistic Regression is a modified form of logistic regression that adds a penalty to Fisher's Scoring function. This improves models that are fit on small or imbalanced data sets. We intend to fit a Firth logistic regression model on the data to predict the probability of shortage because the data set is relatively imbalanced (71 no shortages, 12 shortages).
+Firth's Logistic Regression is a modified form of logistic regression that adds a penalty to Fisher's Scoring function. This improves models that are fit on small or imbalanced data sets (Builder, 2015 page 114). We intend to fit a Firth logistic regression model on the data to predict the probability of shortage because the data set is relatively imbalanced (71 no shortages, 12 shortages).
 
 \newpage
 ## Results 
@@ -167,7 +169,25 @@ This model also did not render a significant predictor. As can be seen in figure
 
 ![Firth and Ordinary Logistic regression Models over layed on Data](logistic models.png){width=250px}
 
+## Shiny App
+
+In order for the reader to easily explore the data for themselves, we have written a Shiny app. It can be accessed and ran by clicking on the link below. 
+
+https://nolan-peterson.shinyapps.io/JobApp/
+
+## Discussion
+
+From the statistical analysis preformed, it can be inferred that there is no strong relationship between the average age of a workers a in occupation in 2016 and shortage status of the occupation in 2019 or the probability of shortage in occupations in 2019 in Wisconsin. However, there are limitations to this analysis. To start with there was only available data for 83 occupations. Within that we are only analyzing the mean age of workers by occupation. The mean is not a robust measure when outliers are introduced into the data. Furthermore no confounding variables were controlled for in the models. In the future  we would like to incorporate more variables into the model. Some variables that we speculate may be desirable are, average education level of occupation, geographical concentration of occupation and broad industry classification of occupation.   
+
 ## References 
+
+1. Veneri, Carolyn M. ”Can occupational labor shortages be identiﬁed usingavailable data.” Monthly Lab. Rev. 122 (1999): 15.
+
+2. Hertz, Tom, and Steven Zahniser. ”Is there a farm labor shortage?.” Amer-ican Journal of Agricultural Economics 95.2 (2013): 476-481.
+
+3. Barnow, Burt & Trutko, John & Piatak, Jaclyn. (2013). How Do We Know Occupational Labor Shortages Exist?. Employment Research. 20. 4-6. 10.17848/1075-8445.20(2)-2. 
+
+4. Bilder, Christopher R., and Thomas M. Loughin. Analysis of Categorical Data with R. CRC Press, Taylor &amp; Francis Group, 2015. 
 
 ## Appendix 
 

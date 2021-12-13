@@ -185,13 +185,16 @@ model <- glm(shortage_ind ~ mean_age_2016, family = binomial, data = cleaned_dat
 
 summary(model)
 
-
 ## Firth model
 
 firth_model <- brglm(shortage_ind ~ mean_age_2016, 
                      family = binomial, 
                      data = cleaned_data, pl = TRUE)
 summary(firth_model)
+
+# Model confidence interval 
+(exp(confint.default(model, pram = "mean_age_2016",level = 0.95)) - 1) * 100 
+
 
 ## Plot models 
 plot(x = cleaned_data$mean_age_2016, 
