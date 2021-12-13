@@ -14,6 +14,7 @@
 library(tidyverse)
 library(readxl)
 library(BBmisc)
+library(brglm)
 
 ## Read in the ACS data for 2016 and 2019 
 ACS_16_raw <- read_csv(file = 'https://raw.githubusercontent.com/NolanPeterson453/Stat-433-Project/main/ACS_WI_2016.csv')
@@ -181,8 +182,37 @@ write.csv(cleaned_data, file = "cleaned_data_433.csv", row.names = FALSE)
 
 ## Model of shortage predicted by age 
 model <- glm(shortage_ind ~ mean_age_2016, family = binomial, data = cleaned_data)
-# Look for other 2016 variables that we can predict with for shortage in 2019 
+
 summary(model)
+
+
+## Firth model
+
+firth_model <- brglm(shortage_ind ~ mean_age_2016, 
+                     family = binomial, 
+                     data = cleaned_data, pl = TRUE)
+summary(firth_model)
+
+## Plot models 
+plot(x = cleaned_data$mean_age_2016, 
+     y = cleaned_data$shortage_ind,
+     main = "Logistic Regression Models",
+     xlab = "Mean Age in Occupation",
+     ylab = "Probabiltiy of Shortage")
+curve(expr = predict(model, newdata = data.frame(mean_age_2016 = x), type = "response"), 
+      add = TRUE, 
+      col = "seagreen",
+      lty = 1)
+curve(expr = predict(firth_model, newdata = data.frame(mean_age_2016 = x), type = "response"), 
+      add = TRUE, 
+      col = "blue",
+      lty = 2)
+legend("left", 
+       legend = c("Logit(pi) = -5.67084 + 0.08992 * mean age",
+                  "Firth's Logit(pi) = -5.34202 + 0.08390 * mean age"), 
+       col = c("seagreen", "blue"), 
+       lty = 1:2 )
+
 
 ## Visualize the relationship
 cleaned_data %>% 

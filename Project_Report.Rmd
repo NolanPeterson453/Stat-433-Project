@@ -19,7 +19,7 @@ The aim of this project is to analyze the relationship between age in occupation
 
 ### Thesis Statments
 
-In this paper we argue that the average age within occupational sectors has bearing on the probability of labor shortage in that occupational sector.  
+In this paper we argue that the average age within occupational sectors in Wisconsin has no significant bearing on the probability of labor shortage in that occupational sector. And furthermore there is no significant relationship between average age within occupational sectors and shortages in occupations in Wisconsin. 
 
 ## Data
 
@@ -39,7 +39,7 @@ An occupational shortage is defined by three criteria:
 
 1. The occupation’s employment growth rate is faster than average employment growth
 
-2. The wage increase is at faster than average.
+2. The wage increase is faster than average.
 
 3. The occupation’s unemployment rate is below average.
 
@@ -51,7 +51,49 @@ The unemployment rate used is the unemployment in 2019.
 
 With these criteria we were able to identify 12 occupations with shortages and 71 without shortages.
 
+### T-test
+
+In this analysis a t-test was used to compare the sample means of 'average worker age in occupation' in occupations suffering from shortages and those not suffering from shortages.  In general the t-test has the following form:  
+
+$$t_{obs} = \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{\frac{\sigma_1^2}{n1} + \frac{\sigma_2^2}{n_2}  }}$$
+
+This value is then compared to the tail critical values from the student's t-distribution. 
+
+A 95$\%$ confidence interval can be calculated for the difference of sample means using $t_{obs}$. It has the following form:
+
+$$(\bar{x}_1 - \bar{x}_2) \pm t_{obs} \times S_p \times\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}$$
+Where $S_p$ is the pooled sample standard deviation and has the form:
+
+$$ S_p = \sqrt{\frac{(n_1 - 1 )\sigma_1^2 + (n_2 - 1 )\sigma_2^2}{n_1 +n_2 -2}}$$
+
+### Logistic Regression 
+
+In general logistic models have the form:
+
+$$ logit(\pi) = \beta_0 + \beta_1  x_1 + ...+\beta_n x_n$$ 
+
+Where $\pi$ is the probability of success in a binary outcome. The model utilizes logit transformation, $\log(\frac{\pi}{1-\pi})$, in order to bind the linear prediction equation between 0 and 1. In this analysis we use a logistic regression model to predict the probability of labor shortages.  
+
+### Wald Confidence Intervals for Predictor effect
+
+Wald confidence intervals can be constructed around the effects of the predictors, in order to gauge their significance in the model. In general the $100(1 - \alpha)\%$ Wald interval for predictor effect has the following form:  
+
+$$ \exp \left( \hat{\beta_1} \pm Z_{1 - \alpha / 2} \sqrt{\hat{Var}(\hat{\beta_1})}\right)$$
+We plan to construct a Wald confidence interval around the effect of 'mean age of work in occupation' in a logistic regression model.
+
+### Wald Test fo Predictor Signifcance 
+
+Similar to the Wald Confidence Intervals for predictor effect, a Wald test for significance of a predictor in a logistic regression model can also be preformed. A Wald test has the general form: 
+
+$$Z_0 = \frac{\hat{\beta}_r}{\sqrt{Var(\hat{\beta}_r)}}$$
+The value is compared to critical values of a standard normal distribution. For example to test at the 95$\%$ confidence level, $|Z_0|$ would be compared against 1.96. We plan to use a Wald test to test the significance of 'mean age of work in occupation' in a logistic regression model.
+
+### Firth's Logistic Regression
+
+Firth's Logistic Regression is a modified form of logistic regression that adds a penalty to Fisher's Scoring function. This improves models that are fit on small or imbalanced data sets. We intend to fit a Firth logistic regression model on the data to predict the probability of shortage because the data set is relatively imbalanced (71 no shortages, 12 shortages).
+
 \newpage
+## Results 
 
 ### T-test for difference in Sample Means
 
@@ -65,23 +107,14 @@ This can be visually explained by looking at the density plots of the ages for t
 
 ![Density plots of age for shortage and non-shortage](age_dist_by_short.png){width=250px}
 
-An appropriate method to test hypothesis is a t test for difference of sample means. The t test statistic is calculated using the below formula.
-
-$$t_{obs} = \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{\frac{\sigma_1^2}{n1} + \frac{\sigma_2^2}{n_2}  }}$$
-
-In our case the t-test statistic was calculated as such:
+An appropriate method to test hypothesis is a t test for difference of sample means. In our case the t-test statistic was calculated as such:
 
 $$ t_{obs} = \frac{44.80 - 41.75}{\sqrt{\frac{4.79^2}{12} + \frac{6.19^2}{71}}} = 1.95$$
-This value is then compared to the upper-tail critical from the student's t-distribution. Which in this case is 1.66. This comparison yields a p-value of 0.027. Which would lead us to reject the null hypothesis at the $\alpha = 0.05$ level.
 
-However, a 95$\%$ confidence interval can be calculated for the difference of sample means using $t_{obs}$. It has the following form:
+The upper tail critical value is 1.66. This comparison yields a p-value of 0.027. Which would lead us to reject the null hypothesis at the $\alpha = 0.05$ level.
 
-$$(\bar{x}_1 - \bar{x}_2) \pm t_{obs} \times S_p \times\sqrt{\frac{1}{n_1} + \frac{1}{n_2}}$$
-Where $S_p$ is the pooled sample standard deviation and has the form:
 
-$$ S_p = \sqrt{\frac{(n_1 - 1 )\sigma_1^2 + (n_2 - 1 )\sigma_2^2}{n_1 +n_2 -2}}$$
-
-When this was applied to our data this was the result:
+When the 95$\%$ confidence interval for difference of sample means was calculated this was the result:
 
 $$(44.80 - 41.75) \pm 1.95 \times 6.02 \times \sqrt{\frac{1}{12} + \frac{1}{71}} = (-0.61, ~6.71)$$
 
@@ -89,7 +122,40 @@ As can be seen in the above interval for difference of means 0 is at the far end
 
 ### Logistic Regression Model
 
-In the data set 
+In the data set a shortage indicator variable was created. It indicates 0 for no shortage and 1 for shortage. We constructed a logistic regression model to predict the probability of shortage. 
+
+Here $\pi$ represents the probability of shortage and we only have a sole predictor; mean age in 2016. 
+
+So our model once it was fit looks like this: 
+
+$$logit(\pi) = -5.67 + 0.09 \times AGE $$
+
+In this model the coefficient of age has the interpretation that with every year the mean age of workers in an occupation is increased the odds of shortage increase by $9.42\%$. A Wald $95\%$ confidence interval can be constructed for the effect of this predictor in R using ```confint()``` function. The result is that with 95$\%$ confidence it can be said that with every year the mean age of workers in an occupation is increased the odds of shortage are increased or decreased somewhere in the range of $-2.07\%$ to $22.23\%$. 
+
+It can be seen that 0 is percent change is within the above confidence interval indicating that it is possible that mean age of workers in an occupation may have a null effect on the probability of labor shortage. To test this concretely we preformed a Wald test for significance of predictor. 
+
+$H_0:$ Mean age is not a significant predictor.
+
+$H_a:$ Mean age is a significant predictor.
+
+In our case the Wald test statistic is calculated as follows:
+
+$$Z_0 = \frac{0.08992}{0.05653} =1.59 < 1.96 = Z_{crit}$$ 
+
+So in this case we fail to reject null hypothesis. 
+
+\newpage
+
+### Firth's Logistic Regression 
+
+As mentioned in the methods section Firth's modified logistic regression can be used to improve model performance on imbalanced data sets. When the ordinary logistic regression was not showing significance for mean age as a predictor, we turned our attention to fitting a Firth logistic regression model in hopes that could address the imbalance within our data. The resulting model was: 
+
+
+$$logit(\pi) = -5.34 + 0.08 \times AGE$$
+
+This model also did not render a significant predictor. As can be seen in figure 4, there is little difference between the Firth Logistic regression model and the ordinary logistic regression model. 
+
+![Firth and Ordinary Logistic regression Models over layed on Data](logistic models.png){width=250px}
 
 ## References 
 
