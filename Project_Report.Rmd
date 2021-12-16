@@ -21,7 +21,7 @@ After careful analysis we found that the data does not necessarily support this 
 
 ### Thesis Statments
 
-In this paper we argue that the average age within occupational sectors in Wisconsin has no significant bearing on the probability of labor shortage in that occupational sector. And furthermore there is no significant relationship between average age within occupational sectors and shortages in occupations in Wisconsin. 
+In this paper we argue that the average age within occupational sectors in Wisconsin has no significant bearing on the probability of labor shortage in that occupational sector. And furthermore, there is no significant relationship between average age within occupational sectors and shortages in occupations in Wisconsin. 
 
 ## Data
 
@@ -150,7 +150,7 @@ When the 95$\%$ confidence interval for difference of sample means was calculate
 
 $$(44.80 - 41.75) \pm 1.90 \times 6.02 \times \sqrt{\frac{1}{12} + \frac{1}{71}} = (-0.684, ~6.78)$$
 
-As can be seen in the above interval for difference of means 0 is at the far end of the interval but not excluded from it. Indicating that even at the $95\%$ confidence level the possibility that the difference in population means is 0 should not be excluded. Agian the null hypothesis is not rejected.
+As can be seen in the above interval for difference of means 0 is at the far end of the interval but not excluded from it indicating that even at the $95\%$ confidence level the possibility that the difference in population means is 0 should not be excluded. Again the null hypothesis is not rejected.
 
 ### Logistic Regression Model
 
@@ -166,7 +166,7 @@ $$logit(\pi) = -5.67 + 0.09 \times AGE $$
 
 In this model the coefficient of age has the interpretation that with every year the mean age of workers in an occupation is increased the odds of shortage increase by $9.42\%$. A Wald $95\%$ confidence interval can be constructed for the effect of this predictor in R using ```confint()``` function. The result is that with 95$\%$ confidence it can be said that with every year the mean age of workers in an occupation is increased the odds of shortage are increased or decreased somewhere in the range of $-2.07\%$ to $22.23\%$. 
 
-It can be seen that 0 is percent change is within the above confidence interval indicating that it is possible that mean age of workers in an occupation may have a null effect on the probability of labor shortage. To test this concretely we preformed a Wald test for significance of predictor. 
+It can be seen that zero percent change is within the above confidence interval indicating that it is possible that mean age of workers in an occupation may have a null effect on the probability of labor shortage. To test this concretely we performed a Wald test for significance of predictor. 
 
 $H_0:$ Mean age is not a significant predictor.
 
