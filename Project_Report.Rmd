@@ -1,7 +1,7 @@
 ---
 title: "Stat 433 Final Project Report"
 author: "Taran Katta, Nolan Peterson, Mark Wu"
-date: "12/17/2021"
+date: "12/16/2021"
 output: pdf_document
 ---
 
@@ -13,11 +13,11 @@ knitr::opts_chunk$set(echo = TRUE, tidy=TRUE, tidy.opts=list(width.cutoff=60), c
 
 ## Introduction
 
-The aim of this project is to analyze the relationship between age in occupational sectors and labor shortages within occupational sectors in Wisconsin. Furthermore we wish to test how well labor shortages can be predicted using ages within said occupational sectors. The motivation behind exploring this relationship is that there is a commonly held idea that jobs which are held mostly by older workers are more prone to shortages. For instance, the average age of farm workers in Wisconsin is 53, which is considerably greater than the average age of all workers in Wisconsin. Additionally there is a shortage of farm workers in Wisconsin. It would not be illogical to assume that there is a connection between these two facts. However, every assumption must be supported by data and careful statistical analysis. In this report we will explore this assumption. We will examine ages within occupations in 2016 and examine shortages within those same occupations in 2019. This hypothesiszed relationship is visualized in figure 1. 
+The aim of this project is to analyze the relationship between age in occupational sectors and labor shortages within occupational sectors in Wisconsin. Furthermore, we wish to test how well labor shortages can be predicted using ages within said occupational sectors. The motivation behind exploring this relationship is that there is a commonly held idea that jobs which are held mostly by older workers are more prone to shortages. For instance, the average age of farm workers in Wisconsin is 53, which is considerably greater than the average age of all workers in Wisconsin. Additionally there is a shortage of farm workers in Wisconsin. It would be logical to assume that there is a connection between these two facts. However, every assumption must be supported by data and careful statistical analysis. In this report we will explore this assumption. We will examine ages within occupations in 2016 and examine shortages within those same occupations in 2019. This hypothesized relationship is visualized in figure 1. 
 
 ![Theorized relationship between Age and Shortage](research question.png)
 
-After analysis we found that the data does not necessarily support this assumption.
+After careful analysis we found that the data does not necessarily support this assumption. 
 
 ### Thesis Statments
 
@@ -25,13 +25,37 @@ In this paper we argue that the average age within occupational sectors in Wisco
 
 ## Data
 
-The code relating to this section can be found in appendix **[Section 1](#Section1)**.
+The data sources and related information can be found in appendix **[Section 1.1](#Section1.1)**.
+
+The code relating to this section can be found in appendix **[Section 1.2](#Section1.2)**.
 
 The data for this project come from two primary sources. The first is American Community Survey (ACS) Person data for Wisconsin. And the second is the Occupational Employment and Wage Statistics (OEWS) state data for Wisconsin also. (Add reference for link) The data in its raw form required a lot of reprocessing. The ACS data for 2016 and 2019 together was 118,336 observations with 288 variables. The vast majority of these variables were not useful to answering our research question. Consequently only the following variables were selected from the ACS data: OCCP (Occupational Code), AGEP (Age of the Person), PWGTP (Replicate Weight Estimate) and ESR (Employment Status). This subset of data was then grouped by year and occupation code, so that a weighted estimate could be constructed of the mean age within occupations and unemployment rate within occupations. The result was data set with 4 variables and 996 observations representing approximately 498 occupations across two years (2016 and 2019). 
 
 This grouped data frame was joined to the OEWS data for Wisconsin for 2016 and 2019 by occupation code. Because there are fewer ACS occupational codes than there are OWES occupational codes, this means that ACS codes tend to be broader and represent more occupations that OWES code. Using a crosswalk key between these two code systems it was determined which codes mapped to each other. In instances where there was multiple OEWS codes for one ACS code, the OEWS observations were merged into one observation. Additionally there were occupations were the sample sized collected was too small to estimate unemployment rates within that occupational sector. These occupations were dropped from the data set, for reasons that will be explained in more detail in the methods section. With this cleaned and joined data estimates of job growth rate and wage growth rate could be constructed. These were added to the data set as additional variables. And finally the data was pivoted wider by year so there was individual variables for both 2016 and 2019. The 79 observation was dropped from the data because it was a very extreme outlier in Job growth rate. The final data set has 83 observations and 22 variables. The steps for the data filtering cleaning and joining are summarized in figure 2.  
 
 ![Data Pre-processing Summarized](data_cleaning flow chart.png)
+
+
+\newpage 
+
+This is a table summarizing the variables in final data set:
+
+| Variable Name                  | Explanation                                                   |
+|--------------------------------|---------------------------------------------------------------|
+| OCCP                           | ACS Occupational Code                                         |
+| ACS Occupational Title         | Title of Occupation                                           |
+| mean_age_(2016 or 2019)        | Average Age of Worker in Occupation                           |
+| unemployed_rate_(2016 or 2019) | Unemployment Rate                                             |
+| total_employ_(2016 or 2019)    | Total Number of Jobs in Occupation                            |
+| employ_prse_(2016 or 2019)     | Standard Error of Employment Estimate                         |
+| jobs_per_1000_(2016 or 2019)   | Share of Jobs per 1000 that Occupation Makes Up               |
+| mean_hourly_(2016 or 2019)     | Mean Hourly Wage of Workers in Occupation                     |
+| mean_annual_(2016 or 2019)     | Mean Annual Salary of Workers in Occupation                   |
+| mean_prse_(2016 or 2019)       | Standard Error of Salary Estimate                             |
+| emp_growth                     | Estimate of Mean Employment Growth in Occp. from 2016 to 2019 |
+| wage_growth                    | Estimate of Mean Wage Growth in Occp. from 2016 to 2019       |
+| shortage_ind                   | A Binary Recode of Shortage, 0 = No Shortage, 1 = Shortage    |
+| Shortage                       | Does Occupation have Shortage or No Shortage                  |
 
 ## Methods 
 
@@ -85,7 +109,7 @@ Wald confidence intervals can be constructed around the effects of the predictor
 $$ \exp \left( \hat{\beta_1} \pm Z_{1 - \alpha / 2} \sqrt{\hat{Var}(\hat{\beta_1})}\right)$$
 We plan to construct a Wald confidence interval around the effect of 'mean age of work in occupation' in a logistic regression model.
 
-### Wald Test fo Predictor Signifcance 
+### Wald Test for Predictor Signifcance 
 
 Similar to the Wald Confidence Intervals for predictor effect, a Wald test for significance of a predictor in a logistic regression model can also be preformed. A Wald test has the general form: 
 
@@ -107,7 +131,7 @@ With the labor shortage properly defined we sought to test the following hypothe
 
  $H_0:$ Mean of all occupation age averages in shortage group = Mean of all occupation age averages in non-shortage group
 
- $H_a:$ Mean of all occupation age averages in shortage group > Mean of all occupation age averages in non-shortage group
+ $H_a:$ Mean of all occupation age averages in shortage group $\neq$ Mean of all occupation age averages in non-shortage group
  
 This can be visually explained by looking at the density plots of the ages for these two groups in figure 3. 
 
@@ -119,14 +143,14 @@ An appropriate method to test hypothesis is a t test for difference of sample me
 
 $$ t_{obs} = \frac{44.80 - 41.75}{\sqrt{\frac{4.79^2}{12} + \frac{6.19^2}{71}}} = 1.95$$
 
-The upper tail critical value is 1.66. This comparison yields a p-value of 0.027. Which would lead us to reject the null hypothesis at the $\alpha = 0.05$ level.
+The upper tail critical value is 1.990. This comparison yields a p-value of 0.054. Which would lead us to fail to reject the null hypothesis at the $\alpha = 0.05$ level.
 
 
 When the 95$\%$ confidence interval for difference of sample means was calculated this was the result:
 
-$$(44.80 - 41.75) \pm 1.95 \times 6.02 \times \sqrt{\frac{1}{12} + \frac{1}{71}} = (-0.61, ~6.71)$$
+$$(44.80 - 41.75) \pm 1.90 \times 6.02 \times \sqrt{\frac{1}{12} + \frac{1}{71}} = (-0.684, ~6.78)$$
 
-As can be seen in the above interval for difference of means 0 is at the far end of the interval but not excluded from it. Indicating that even at the $95\%$ confidence level the possibility that the difference in population means is 0 should not be excluded. 
+As can be seen in the above interval for difference of means 0 is at the far end of the interval but not excluded from it. Indicating that even at the $95\%$ confidence level the possibility that the difference in population means is 0 should not be excluded. Agian the null hypothesis is not rejected.
 
 ### Logistic Regression Model
 
@@ -175,13 +199,13 @@ In order for the reader to easily explore the data for themselves, we have writt
 
 https://nolan-peterson.shinyapps.io/JobApp/
 
-## Discussion
+## Conclusion
 
 From the statistical analysis preformed, it can be inferred that there is no strong relationship between the average age of a workers a in occupation in 2016 and shortage status of the occupation in 2019 or the probability of shortage in occupations in 2019 in Wisconsin. However, there are limitations to this analysis. To start with there was only available data for 83 occupations. Within that we are only analyzing the mean age of workers by occupation. The mean is not a robust measure when outliers are introduced into the data. Furthermore no confounding variables were controlled for in the models. In the future  we would like to incorporate more variables into the model. Some variables that we speculate may be desirable are, average education level of occupation, geographical concentration of occupation and broad industry classification of occupation.   
 
 ## References 
 
-1. Veneri, Carolyn M. ”Can occupational labor shortages be identiﬁed usingavailable data.” Monthly Lab. Rev. 122 (1999): 15.
+1. Veneri, Carolyn M. ”Can occupational labor shortages be identified using available data.” Monthly Lab. Rev. 122 (1999): 15.
 
 2. Hertz, Tom, and Steven Zahniser. ”Is there a farm labor shortage?.” Amer-ican Journal of Agricultural Economics 95.2 (2013): 476-481.
 
@@ -191,7 +215,33 @@ From the statistical analysis preformed, it can be inferred that there is no str
 
 ## Appendix 
 
-### Appendix Section 1 Data Cleaning {#Section1}
+### Appendix Section 1.1 Data Soucres {#Section1.1}
+
+Link to ACS 2016 personal Wisconsin data:
+
+https://www2.census.gov/programs-surveys/acs/data/pums/2016/1-Year/csv_pwi.zip
+
+Link to ACS 2019 personal Wisconsin data:
+
+https://www2.census.gov/programs-surveys/acs/data/pums/2019/1-Year/csv_pwi.zip
+
+Link to ACS 2015-2019 personal data, data dictionary:
+
+https://www2.census.gov/programs-surveys/acs/tech_docs/pums/data_dict/PUMS_Data_Dictionary_2015-2019.pdf
+
+Link to OEWS 2016 state data:
+
+https://www.bls.gov/oes/special.requests/oesm16st.zip
+
+Link to OEWS 2019 state data:
+
+https://www.bls.gov/oes/special.requests/oesm19st.zip
+
+Link to ACS to OEWS OCCP code crosswalk key:
+
+https://www.bls.gov/emp/classifications-crosswalks/nem-occcode-acs-crosswalk.xlsx
+
+### Appendix Section 1.2 Data Cleaning {#Section1.2}
 
 ```{r eval=F, echo=T}
 
@@ -377,9 +427,9 @@ write.csv(cleaned_data, file = "cleaned_data_433.csv", row.names = FALSE)
 ```{r eval=F, echo=T}
 # H_0: Mean_age_shortage_group = Mean_age_no_shortage_group
 
-# H_a: Mean_age_shortage_group > Mean_age_no_shortage_group
+# H_a: Mean_age_shortage_group != Mean_age_no_shortage_group
 
-data <- read_csv(file = 
+data <- read.csv(file = 
                    
 "https://raw.githubusercontent.com/NolanPeterson453/Stat-433-Project/main/cleaned_data_433.csv")
 
@@ -397,17 +447,20 @@ sd_2 <- sd(data$mean_age_2016[data$shortage == "No Shortage"])
 
 t_obs <- (x_bar_1 - x_bar_2) / sqrt(sd_1^2 / n_1 + sd_2^2 / n_2) #1.948891
 
-t_crit <- qt(p = 0.05, df = n_1 + n_2 - 2, lower.tail=FALSE) #1.663884
+t_crit <- qt(p = 0.05/2, df = n_1 + n_2 - 2, lower.tail=FALSE) #1.989686
 
-p_value <- pt(q = t_obs, df = n_1 + n_2 - 2, lower.tail=FALSE) #0.02738522
+p_value <- 2 * pt(q = t_obs, df = n_1 + n_2 - 2, lower.tail=FALSE) # 0.05477044
 
 # 95% Confidence intervals for difference in pop means using the t test statistic 
 
 S_p <- sqrt(((n_1 - 1) * sd_1^2 + (n_2 - 1) * sd_2^2  ) / (n_1 + n_2 - 2)) #6.016206
 
-lower <- (x_bar_1 - x_bar_2) - t_obs * S_p * sqrt(1/n_1 + 1/n_2) #-0.6078939
+lower <- (x_bar_1 - x_bar_2) - t_crit * S_p * sqrt(1/n_1 + 1/n_2) #-0.6844983
 
-upper <- (x_bar_1 - x_bar_2) + t_obs * S_p * sqrt(1/n_1 + 1/n_2) #6.711236
+upper <- (x_bar_1 - x_bar_2) + t_crit * S_p * sqrt(1/n_1 + 1/n_2) #6.787841
+
+
+
 ```
 
 ### Appendix Section 2.2 Density Plots {#Section2.2}
